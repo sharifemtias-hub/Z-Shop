@@ -11,27 +11,44 @@ class EmojiReactionSystem {
     this.reactions = [
       // Shopping Actions
       { emoji: '🛒', trigger: 'add-to-cart', color: '#FF6B6B', label: 'Added!' },
+      { emoji: '💝', trigger: 'add-to-cart', color: '#FF1744', label: 'Saved!' },
+      { emoji: '✨', trigger: 'add-to-cart', color: '#FFD700', label: 'Nice!' },
+      
+      // Wishlist Actions
       { emoji: '❤️', trigger: 'wishlist-add', color: '#FF1744', label: 'Loved!' },
-      { emoji: '💝', trigger: 'wishlist-add', color: '#FF69B4', label: 'Saved!' },
+      { emoji: '💕', trigger: 'wishlist-add', color: '#E91E63', label: 'Liked!' },
+      { emoji: '💖', trigger: 'wishlist-add', color: '#F06292', label: 'Adored!' },
+      { emoji: '🌸', trigger: 'wishlist-add', color: '#FF69B4', label: 'Beautiful!' },
       
       // Success Actions
       { emoji: '✨', trigger: 'success', color: '#FFD700', label: 'Perfect!' },
       { emoji: '🎉', trigger: 'success', color: '#FF6B9D', label: 'Woohoo!' },
       { emoji: '⭐', trigger: 'success', color: '#FFC107', label: 'Awesome!' },
+      { emoji: '🌟', trigger: 'success', color: '#FFD700', label: 'Stellar!' },
       
       // Checkout Actions
       { emoji: '💳', trigger: 'checkout', color: '#4CAF50', label: 'Payment!' },
-      { emoji: '✓', trigger: 'checkout', color: '#4CAF50', label: 'Confirmed!' },
+      { emoji: '✓', trigger: 'checkout', color: '#4CAF50', label: 'Done!' },
+      { emoji: '💚', trigger: 'checkout', color: '#4CAF50', label: 'Confirmed!' },
+      
+      // Order Placed
       { emoji: '🎁', trigger: 'order-placed', color: '#9C27B0', label: 'Order!' },
-      
-      // Purchase Success
       { emoji: '🚀', trigger: 'order-placed', color: '#2196F3', label: 'Shipped!' },
-      { emoji: '👍', trigger: 'success', color: '#FF9800', label: 'Great!' },
-      { emoji: '💕', trigger: 'wishlist-add', color: '#E91E63', label: 'Liked!' },
+      { emoji: '📦', trigger: 'order-placed', color: '#FF9800', label: 'Coming!' },
+      { emoji: '🎊', trigger: 'order-placed', color: '#FF6B9D', label: 'Yay!' },
       
-      // Remove/Negative
+      // Wishlist Remove
       { emoji: '🗑️', trigger: 'remove', color: '#F44336', label: 'Removed!' },
+      
+      // Out of Stock
       { emoji: '😢', trigger: 'out-of-stock', color: '#9E9E9E', label: 'OOS!' },
+      
+      // Welcome Message
+      { emoji: '👋', trigger: 'welcome', color: '#2196F3', label: 'Welcome!' },
+      { emoji: '🎉', trigger: 'welcome', color: '#FF6B9D', label: 'Hello!' },
+      { emoji: '💫', trigger: 'welcome', color: '#FFD700', label: 'Hi!' },
+      { emoji: '✨', trigger: 'welcome', color: '#00BCD4', label: 'Hey!' },
+      { emoji: '🌈', trigger: 'welcome', color: '#9C27B0', label: 'Hooray!' },
     ];
 
     this.init();
@@ -40,6 +57,7 @@ class EmojiReactionSystem {
   init() {
     this.createContainer();
     this.attachEventListeners();
+    this.showWelcomeMessage();
   }
 
   createContainer() {
@@ -57,6 +75,53 @@ class EmojiReactionSystem {
       `;
       document.body.appendChild(this.container);
     }
+  }
+
+  /**
+   * Welcome message with floating emojis at bottom
+   */
+  showWelcomeMessage() {
+    const welcomeEmojis = [
+      { emoji: '👋', delay: 0 },
+      { emoji: '🎉', delay: 200 },
+      { emoji: '💫', delay: 400 },
+      { emoji: '✨', delay: 600 },
+      { emoji: '🌟', delay: 800 },
+    ];
+
+    welcomeEmojis.forEach(item => {
+      setTimeout(() => {
+        this.createWelcomeEmoji(item.emoji);
+      }, item.delay);
+    });
+  }
+
+  /**
+   * Create welcome emoji floating at bottom
+   */
+  createWelcomeEmoji(emoji) {
+    const welcomeEmoji = document.createElement('div');
+    welcomeEmoji.className = 'welcome-emoji';
+    welcomeEmoji.innerHTML = emoji;
+    
+    const randomX = Math.random() * (window.innerWidth - 60);
+    const startY = window.innerHeight - 80;
+    
+    welcomeEmoji.style.cssText = `
+      position: fixed;
+      left: ${randomX}px;
+      bottom: 20px;
+      font-size: 48px;
+      pointer-events: none;
+      z-index: 9999;
+      user-select: none;
+      -webkit-user-select: none;
+      animation: welcomeFloat 4s ease-out forwards;
+    `;
+    
+    document.body.appendChild(welcomeEmoji);
+    
+    setTimeout(() => welcomeEmoji.remove(), 4000);
   }
 
   /**
@@ -127,16 +192,15 @@ class EmojiReactionSystem {
     const originalAddToCart = window.addToCart;
     if (originalAddToCart) {
       window.addToCart = (id) => {
-        originalAddToCart.call(window, id);
-        const event = new MouseEvent('click', {
-          bubbles: true,
-          cancelable: true,
-          view: window
-        });
-        const button = event.target;
-        const x = event.clientX || window.innerWidth / 2;
-        const y = event.clientY || window.innerHeight / 2;
-        this.burstEmojis('add-to-cart', x, y, 3);
+        try {
+          originalAddToCart.call(window, id);
+          // Trigger emoji burst at center
+          setTimeout(() => {
+            this.burstEmojis('add-to-cart', window.innerWidth / 2, window.innerHeight / 2, 4);
+          }, 100);
+        } catch (error) {
+          console.error('Error in addToCart:', error);
+        }
       };
     }
 
@@ -144,13 +208,12 @@ class EmojiReactionSystem {
     const originalToggleWishlist = window.toggleWishlist;
     if (originalToggleWishlist) {
       window.toggleWishlist = (id) => {
-        const product = products?.find(p => p.id === id);
         const isAdding = !wishlist.includes(id);
         
         originalToggleWishlist.call(window, id);
         
         if (isAdding) {
-          this.burstEmojis('wishlist-add', window.innerWidth / 2, window.innerHeight / 3, 4);
+          this.burstEmojis('wishlist-add', window.innerWidth / 2, window.innerHeight / 3, 5);
         }
       };
     }
@@ -165,7 +228,7 @@ class EmojiReactionSystem {
           setTimeout(() => {
             const emojiSystem = window.emojiReactionSystem;
             if (emojiSystem && document.getElementById('successModal').style.display === 'flex') {
-              emojiSystem.burstEmojis('order-placed', window.innerWidth / 2, window.innerHeight / 2, 8);
+              emojiSystem.burstEmojis('order-placed', window.innerWidth / 2, window.innerHeight / 2, 10);
             }
           }, 500);
         } catch (error) {
