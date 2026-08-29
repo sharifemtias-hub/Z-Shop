@@ -33,6 +33,103 @@ a {
 }
 
 
+/* ================= EMOJI REACTIONS - PREMIUM 3D EFFECTS ================= */
+
+@keyframes floatEmoji {
+  0% {
+    transform: perspective(1000px) 
+               rotateX(0deg) 
+               rotateY(0deg) 
+               scale(1) 
+               translateY(0px)
+               translateX(0px);
+    opacity: 1;
+    filter: drop-shadow(0 8px 16px rgba(0,0,0,0.2));
+  }
+  
+  25% {
+    transform: perspective(1000px) 
+               rotateX(15deg) 
+               rotateY(var(--rotation)) 
+               scale(1.15) 
+               translateY(-50px)
+               translateX(var(--offset-x));
+    opacity: 1;
+    filter: drop-shadow(0 12px 24px rgba(0,0,0,0.3));
+  }
+  
+  50% {
+    transform: perspective(1000px) 
+               rotateX(28deg) 
+               rotateY(calc(var(--rotation) * 1.5)) 
+               scale(1.25) 
+               translateY(-100px)
+               translateX(calc(var(--offset-x) * 1.8));
+    opacity: 1;
+    filter: drop-shadow(0 16px 32px rgba(0,0,0,0.25));
+  }
+  
+  75% {
+    transform: perspective(1000px) 
+               rotateX(15deg) 
+               rotateY(var(--rotation)) 
+               scale(1.15) 
+               translateY(-140px)
+               translateX(var(--offset-x));
+    opacity: 0.85;
+    filter: drop-shadow(0 12px 24px rgba(0,0,0,0.15));
+  }
+  
+  100% {
+    transform: perspective(1000px) 
+               rotateX(0deg) 
+               rotateY(0deg) 
+               scale(0.4) 
+               translateY(-200px)
+               translateX(var(--offset-x));
+    opacity: 0;
+    filter: drop-shadow(0 0px 0px rgba(0,0,0,0));
+  }
+}
+
+@keyframes emojiGlow {
+  0%, 100% {
+    text-shadow: 
+      2px 2px 4px rgba(0,0,0,0.2),
+      -2px -2px 4px rgba(255,255,255,0.5),
+      0 0 20px rgba(255,215,0,0.3);
+  }
+  50% {
+    text-shadow: 
+      3px 3px 8px rgba(0,0,0,0.25),
+      -3px -3px 8px rgba(255,255,255,0.6),
+      0 0 35px rgba(255,215,0,0.5);
+  }
+}
+
+.floating-emoji {
+  will-change: transform, opacity;
+  font-variant: emoji;
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  animation: emojiGlow 0.8s ease-in-out infinite;
+  font-weight: bold;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+}
+
+#emoji-reactions-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+
 /* ================= HEADER ================= */
 
 .header {
